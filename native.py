@@ -27,8 +27,9 @@ Settings.llm = Ollama(model="llama3.2", request_timeout=3600.0,)
 # check if storage already exists
 PERSIST_DIR = "./storage"
 if not os.path.exists(PERSIST_DIR):
+    print("Createing store")
     # load the documents and create the index
-    documents = SimpleDirectoryReader("data").load_data()
+    documents = SimpleDirectoryReader("data", recursive=True, required_exts=[".md"]).load_data()
 
     
     index = VectorStoreIndex.from_documents(documents)
@@ -42,5 +43,5 @@ else:
 
 
 query_engine = index.as_query_engine()
-response = query_engine.query("""List out in bullets all the unique ideas that I have written articles on.""")
+response = query_engine.query("""Write a function in PURE language to return a difference between two StrictDate dates""")
 print(response)
