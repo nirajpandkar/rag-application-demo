@@ -1,6 +1,10 @@
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 import os
 import os.path
+
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.llms.ollama import Ollama
+
 
 from llama_index.core import (
     VectorStoreIndex,
@@ -9,9 +13,16 @@ from llama_index.core import (
     load_index_from_storage,
 )
 
-with open("openai-key.txt") as infile:
-    openai_api_key = infile.read()
-os.environ['OPENAI_API_KEY'] = openai_api_key
+# Read the api key
+# with open("openai-key.txt") as infile:
+#     openai_api_key = infile.read()
+# os.environ['OPENAI_API_KEY'] = openai_api_key
+
+# bge-base embedding model
+Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5")
+
+# Set the LLM to be used for querying
+Settings.llm = Ollama(model="llama3.2", request_timeout=3600.0,)
 
 # check if storage already exists
 PERSIST_DIR = "./storage"
@@ -31,5 +42,5 @@ else:
 
 
 query_engine = index.as_query_engine()
-response = query_engine.query("""In the beginning of all the documents, you'll find numbered bullets listing out the heading of the articles. Please list all of them out here.""")
+response = query_engine.query("""List out in bullets all the unique ideas that I have written articles on.""")
 print(response)
